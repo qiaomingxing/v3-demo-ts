@@ -8,7 +8,7 @@ export function useLoadMore(refreshElm: Ref<null | HTMLElement>, store: Store<IG
     // 防抖
     let element: HTMLElement;
     function _loadMore() {
-        // 获取可是区域高度  卷曲的高度  整个高度
+        // 获取可视区域高度  卷曲的高度  整个高度
         let containerHeight = element.clientHeight;
         let scrollTop = element.scrollTop;
         let scrollHeight = element.scrollHeight;

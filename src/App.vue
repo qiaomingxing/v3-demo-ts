@@ -5,7 +5,7 @@
     </keep-alive>
   </router-view>
 
-  <van-tabbar>
+  <van-tabbar route>
     <van-tabbar-item to="/" icon="home-o">首页</van-tabbar-item>
     <van-tabbar-item to="/mine" icon="orders-o">课程页</van-tabbar-item>
     <van-tabbar-item to="/profile" icon="manager-o">个人中心</van-tabbar-item>
