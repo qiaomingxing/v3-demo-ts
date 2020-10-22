@@ -2,44 +2,40 @@
   <div class="home-header">
     <img src="@/assets/logo.png" alt="" />
     <van-dropdown-menu>
-      <van-dropdown-item
-        :modelValue="category"
-        :options="options"
-        @change="change"
-      />
+      <van-dropdown-item :modelValue="category" :options="options" @change="change" />
     </van-dropdown-menu>
   </div>
 </template>
 
 <script lang="ts">
-import { CATEGORY_TYPES } from "@/typings/home";
-import { defineComponent, PropType, reactive, toRefs } from "vue";
+import { CATEGORY_TYPES } from '@/typings/home'
+import { defineComponent, PropType, reactive, toRefs } from 'vue'
 
 export default defineComponent({
   props: {
     category: {
-      type: Number as PropType<CATEGORY_TYPES>,
-    },
+      type: Number as PropType<CATEGORY_TYPES>
+    }
   },
-  emits: ["setCurrentCategory"],
+  emits: ['setCurrentCategory'],
   setup(props, context) {
     let state = reactive({
       options: [
-        { text: "全部课程", value: CATEGORY_TYPES.ALL },
-        { text: "React课程", value: CATEGORY_TYPES.REACT },
-        { text: "Vue课程", value: CATEGORY_TYPES.VUE },
-        { text: "Node课程", value: CATEGORY_TYPES.NODE },
-      ],
-    });
+        { text: '全部课程', value: CATEGORY_TYPES.ALL },
+        { text: 'React课程', value: CATEGORY_TYPES.REACT },
+        { text: 'Vue课程', value: CATEGORY_TYPES.VUE },
+        { text: 'Node课程', value: CATEGORY_TYPES.NODE }
+      ]
+    })
     function change(value: CATEGORY_TYPES) {
-      context.emit("setCurrentCategory", value);
+      context.emit('setCurrentCategory', value)
     }
     return {
       ...toRefs(state),
-      change,
-    };
-  },
-});
+      change
+    }
+  }
+})
 </script>
 
 <style lang="scss">
