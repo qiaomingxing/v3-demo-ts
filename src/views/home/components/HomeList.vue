@@ -1,29 +1,49 @@
 <template>
-  <van-card v-for="v in lessonList" :key="v.id" :price="v.price" :title="v.title" :thumb="v.poster">
-    <template #tags>
-      <van-tag plain>{{ formatCategory(v.category) }}</van-tag>
+  <van-card v-for="v in datas" :key="v.id" :title="v.title" :thumb="v.envelopePic" :desc="v.desc" @click="onClick(v.projectLink)">
+    <template #price>
+      <div class="bottom">
+        <van-tag plain type="primary">{{ v.niceDate }}</van-tag>
+        <van-tag plain type="success">{{ formatstr(v.author) }}</van-tag>
+      </div>
     </template>
   </van-card>
 </template>
 <script lang="ts">
-import { ILesson } from '@/typings/home'
+import { IProject } from '@/typings/home'
 import { defineComponent, PropType } from 'vue'
 
 export default defineComponent({
   props: {
-    lessonList: {
-      type: Array as PropType<ILesson[]>
+    datas: {
+      type: Array as PropType<IProject[]>
     }
   },
   setup(props, context) {
-    //  根据category转化成对应课程名称
-    function formatCategory(type: number) {
-      return type === 1 ? 'react课程' : type == 2 ? 'vue课程' : type == 3 ? 'Node课程' : '未知'
+    function onClick(url: string) {
+      window.open(url)
+    }
+
+    function formatstr(value: string) {
+      return `${value}`
     }
 
     return {
-      formatCategory
+      onClick,
+      formatstr
     }
   }
 })
 </script>
+
+<style lang="scss">
+.bottom {
+  width: 100%;
+  .van-tag {
+    display: inline-block;
+    margin-left: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+</style>

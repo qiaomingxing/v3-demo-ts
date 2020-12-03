@@ -1,7 +1,7 @@
 <template>
   <van-swipe v-if="sliderList" class="my-swipe" :autoplay="3000" indicator-color="white">
     <van-swipe-item v-for="v in sliderList" :key="v.url">
-      <img :src="v.url" alt="" style="max-width: 100%" />
+      <img :src="v.imagePath" alt="" style="max-width: 100%" @click="onClick(v.url)" />
     </van-swipe-item>
   </van-swipe>
 </template>
@@ -13,6 +13,10 @@ import * as Types from '@/store/action-types'
 
 export default defineComponent({
   async setup(props, context) {
+    
+    function onClick(url: string) {
+      window.open(url)
+    }
     //  页面初始化获取数据
     let store = useStore<IGlobalState>()
     let sliderList = computed(() => store.state.home.sliders)
@@ -22,6 +26,7 @@ export default defineComponent({
     }
 
     return {
+      onClick,
       sliderList
     }
   }

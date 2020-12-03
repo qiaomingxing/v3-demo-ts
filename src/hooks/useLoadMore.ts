@@ -23,10 +23,10 @@ export function useLoadMore(refreshElm: Ref<null | HTMLElement>, store: Store<IG
   })
 
   const isLoading = computed(() => {
-    return store.state.home.lessons.loading
+    return store.state.home.projects.loading
   })
   const hasMore = computed(() => {
-    return store.state.home.lessons.hasMore
+    return store.state.home.projects.hasMore
   })
 
   return {

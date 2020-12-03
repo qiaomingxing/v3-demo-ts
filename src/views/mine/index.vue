@@ -1,5 +1,5 @@
 <template>
-  <div class="mine">mine</div>
+  <div class="mine">课程页</div>
 </template>
 
 <script lang="ts">

@@ -1,23 +1,24 @@
-import { CATEGORY_TYPES, IHomeState, ILessons, ISlider } from '@/typings/home'
+import { IHomeState, ISlider, IProjects, IProjectTree } from '@/typings/home'
 import { Module } from 'vuex'
 import { IGlobalState } from '..'
 import * as Types from '@/store/action-types'
-import { getLessons, getSliders } from '@/api/modules/home'
+import { getProjects, getSliders, getProjectTrees } from '@/api/modules/home'
 
-// 初始化课程数据对象
-const initialLessons: ILessons = {
+// 初始化项目数据对象
+const initialProjects: IProjects = {
   hasMore: true,
   loading: false,
-  offset: 0,
-  limit: 5,
-  list: []
+  curPage: 1,
+  pageCount: 15,
+  datas: []
 }
 
 // 模块状态定义
 const state: IHomeState = {
-  currentCategory: CATEGORY_TYPES.ALL,
+  currentCategory: 294,
   sliders: [],
-  lessons: Object.assign({}, initialLessons)
+  projects: Object.assign({}, initialProjects),
+  projectTrees: []
 }
 
 /**
@@ -29,7 +30,7 @@ const module: Module<IHomeState, IGlobalState> = {
   state,
   mutations: {
     // 设置分类
-    [Types.SET_CATEGORY](state, payload: CATEGORY_TYPES) {
+    [Types.SET_CATEGORY](state, payload: string | number) {
       state.currentCategory = payload
     },
     // 设置轮播图
@@ -38,14 +39,19 @@ const module: Module<IHomeState, IGlobalState> = {
     },
     // 设置loading
     [Types.SET_LOADING](state, payload: boolean) {
-      state.lessons.loading = payload
+      state.projects.loading = payload
     },
-    // 设置课程列表
-    [Types.SET_LESSON_LIST](state, payload: ILessons) {
-      state.lessons.list = [...state.lessons.list, ...payload.list]
-      state.lessons.hasMore = payload.hasMore
-      state.lessons.offset = state.lessons.offset + payload.list.length
-      state.lessons.loading = false
+    // 设置项目分类
+    [Types.SET_PROJECT_TREE_LIST](state, payload: IProjectTree[]) {
+      state.projectTrees = payload.map((item: IProjectTree) => {
+        return { text: item.name, value: item.id }
+      })
+    },
+    // 设置项目列表
+    [Types.SET_PROJECT_LIST](state, payload: IProjects) {
+      state.projects.datas = [...state.projects.datas, ...payload.datas]
+      state.projects.hasMore = payload.curPage < payload.pageCount
+      state.projects.loading = false
     }
   },
   actions: {
@@ -53,28 +59,35 @@ const module: Module<IHomeState, IGlobalState> = {
      * 获取轮播图数据
      */
     async [Types.SET_SLIDER_LIST]({ commit }) {
-      let sliders = await getSliders<ISlider>()
-      commit(Types.SET_SLIDER_LIST, sliders)
+      const res = await getSliders<ISlider>()
+      commit(Types.SET_SLIDER_LIST, res)
     },
     /**
-     * 获取课程列表数据
+     * 获取项目分类列表
+     */
+    async [Types.SET_PROJECT_TREE_LIST]({ commit }) {
+      const res = await getProjectTrees<IProjectTree[]>()
+      commit(Types.SET_PROJECT_TREE_LIST, res)
+    },
+    /**
+     * 获取项目列表数据
      * @param initial 是否为初始化数据
      */
-    async [Types.SET_LESSON_LIST]({ commit, state }, initial: boolean = false) {
-      const { loading, hasMore } = state.lessons
+    async [Types.SET_PROJECT_LIST]({ commit, state }, initial: boolean = false) {
+      const { loading, hasMore } = state.projects
       // 1）不是初始化加载 2）正在加载 或 没有更多数据
       if (!initial && (loading || !hasMore)) {
         return
       }
       // 是否为初始化加载
       if (initial) {
-        state.lessons = Object.assign({}, initialLessons)
+        state.projects = Object.assign({}, initialProjects)
       }
       // 开始加载数据，显示loading
       commit(Types.SET_LOADING, true)
       // 接口获取数据
-      let lessons = await getLessons<ILessons>(state.currentCategory, state.lessons.offset, state.lessons.limit)
-      commit(Types.SET_LESSON_LIST, lessons)
+      const res = await getProjects<IProjects>(state.currentCategory, state.projects.curPage++)
+      commit(Types.SET_PROJECT_LIST, res)
     }
   }
 }

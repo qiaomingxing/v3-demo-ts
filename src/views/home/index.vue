@@ -1,7 +1,7 @@
 <template>
   <div class="home-wrap">
     <!-- 首页头部 -->
-    <HomeHeader :category="category" @setCurrentCategory="setCurrentCategory" />
+    <HomeHeader :datas="projectTrees" :category="category" @setCurrentCategory="setCurrentCategory" />
     <div class="home-container" ref="refreshElm">
       <!-- 轮播图 -->
       <Suspense>
@@ -12,8 +12,8 @@
           <div>加载中...</div>
         </template>
       </Suspense>
-      <!-- 课程列表 -->
-      <HomeList :lessonList="lessonList" />
+      <!-- 项目列表 -->
+      <HomeList :datas="homeList" />
       <!-- 上拉加载提示文案 -->
       <div v-if="isLoading" class="is-text-center has-pd-10">
         <van-loading>加载中...</van-loading>
@@ -25,7 +25,6 @@
 
 <script lang="ts">
 import { IGlobalState } from '@/store'
-import { CATEGORY_TYPES } from '@/typings/home'
 import { computed, defineComponent, onMounted, ref } from 'vue'
 import { Store, useStore } from 'vuex'
 import * as Types from '@/store/action-types'
@@ -36,9 +35,9 @@ import HomeSwiper from './components/HomeSwiper.vue'
 
 function useCategory(store: Store<IGlobalState>) {
   let category = computed(() => store.state.home.currentCategory) // vuex中状态
-  function setCurrentCategory(category: CATEGORY_TYPES) {
-    store.commit(`home/${Types.SET_CATEGORY}`, category)
-    store.dispatch(`home/${Types.SET_LESSON_LIST}`, true)
+  function setCurrentCategory(value: string | number) {
+    store.commit(`home/${Types.SET_CATEGORY}`, value)
+    store.dispatch(`home/${Types.SET_PROJECT_LIST}`, true)
   }
 
   return {
@@ -47,18 +46,27 @@ function useCategory(store: Store<IGlobalState>) {
   }
 }
 
-function useLessonList(store: Store<IGlobalState>) {
-  let lessonList = computed(() => store.state.home.lessons.list) // vuex中状态
+function userProjectTrees(store: Store<IGlobalState>) {
+  const projectTrees = computed(() => store.state.home.projectTrees)
+  onMounted(() => {
+    // 初始化加载，如果vuex中有数据了，就不用继续加载了
+    if (projectTrees.value.length === 0) {
+      store.dispatch(`home/${Types.SET_PROJECT_TREE_LIST}`)
+    }
+  })
+  return { projectTrees }
+}
+
+function useHomeList(store: Store<IGlobalState>) {
+  let homeList = computed(() => store.state.home.projects.datas) // vuex中状态
 
   onMounted(() => {
     // 初始化加载，如果vuex中有数据了，就不用继续加载了
-    if (lessonList.value.length === 0) {
-      store.dispatch(`home/${Types.SET_LESSON_LIST}`)
+    if (homeList.value.length === 0) {
+      store.dispatch(`home/${Types.SET_PROJECT_LIST}`)
     }
   })
-  return {
-    lessonList
-  }
+  return { homeList }
 }
 
 export default defineComponent({
@@ -72,17 +80,19 @@ export default defineComponent({
     let store = useStore<IGlobalState>()
     // 分类
     let { category, setCurrentCategory } = useCategory(store)
-    // 课程列表
-    let { lessonList } = useLessonList(store)
+    let { projectTrees } = userProjectTrees(store)
+    // 项目列表
+    let { homeList } = useHomeList(store)
     // 获取真实dom
     const refreshElm = ref<null | HTMLElement>(null)
 
-    const { isLoading, hasMore } = useLoadMore(refreshElm, store, `home/${Types.SET_LESSON_LIST}`)
+    const { isLoading, hasMore } = useLoadMore(refreshElm, store, `home/${Types.SET_PROJECT_LIST}`)
 
     return {
       category,
       setCurrentCategory,
-      lessonList,
+      projectTrees,
+      homeList,
       refreshElm,
       isLoading,
       hasMore
