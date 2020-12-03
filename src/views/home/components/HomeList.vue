@@ -1,5 +1,5 @@
 <template>
-  <van-card v-for="v in datas" :key="v.id" :title="v.title" :thumb="v.envelopePic" :desc="v.desc" @click="onClick(v.projectLink)">
+  <van-card v-for="v in datas" :key="v.id" :title="v.title" :thumb="v.envelopePic" :desc="v.desc" @click="onClick(v.link)">
     <template #price>
       <div class="bottom">
         <van-tag plain type="primary">{{ v.niceDate }}</van-tag>
