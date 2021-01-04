@@ -1,21 +1,12 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
+import request from '../request'
 
-// axios.defaults.baseURL = `https://www.wanandroid.com`
-
-axios.interceptors.request.use((config: AxiosRequestConfig) => {
-  return config
+const modulesFiles = require.context('./modules', true, /\.ts$/)
+// 注册
+modulesFiles.keys().forEach(modulePath => {
+  console.log(modulePath)
+  const moduleName = modulePath.replace(/^\.\/(.*)\.\w+$/, '$1')
+  const value = modulesFiles(modulePath)
+  request.reg(moduleName, value.default)
 })
 
-axios.interceptors.response.use(
-  (response: AxiosResponse) => {
-    if (response.data.err == 1) {
-      return Promise.reject(response.data.data)
-    }
-    return response.data.data
-  },
-  err => {
-    return Promise.reject(err)
-  }
-)
-
-export default axios
+export default request
